@@ -40,6 +40,11 @@
             border-radius: 8px;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
         }
+        
+        .error-field {
+            color: #FF0000 !important;
+            border-color: #FF0000 !important;
+        }
     </style>
 </head>
 <body>
@@ -83,25 +88,25 @@
                 <h3 class="text-center mb-4" style="color: #4e73df;">Sign Up</h3>
                 
                 <!-- Bootstrap Signup Form -->
-                <form>
+                <form onsubmit="return validateForm()">
                     <div class="mb-3">
                         <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" placeholder="Enter username" required>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username" onfocus="clearError(this)" onfocusout="validateField(this)">
                     </div>
                     
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" placeholder="Enter email" required>
+                        <input type="email" class="form-control" id="email" placeholder="Enter email" onfocus="clearError(this)" onfocusout="validateEmail(this)">
                     </div>
                     
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" onfocus="clearError(this)" onfocusout="validatePassword(this)">
                     </div>
                     
                     <div class="mb-3">
                         <label for="confirmPassword" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" required>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm password" onfocus="clearError(this)" onfocusout="validateConfirmPassword(this)">
                     </div>
                     
                     <button type="submit" class="btn btn-primary w-100" style="background-color: #4e73df; border-color: #4e73df;">Create Account</button>
@@ -138,5 +143,106 @@
 
     <!-- Bootstrap JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Validation JavaScript -->
+    <script>
+        function clearError(obj) {
+            // Clear error when user clicks into the field
+            if (obj.classList.contains('error-field')) {
+                obj.classList.remove('error-field');
+                // Clear error message if it's one of our error texts
+                const errorMessages = [
+                    "Field is required",
+                    "Email is required",
+                    "Invalid email format (e.g., joe@test.com)",
+                    "Password is required",
+                    "Password must be at least 6 characters",
+                    "Please confirm your password",
+                    "Passwords do not match"
+                ];
+                if (errorMessages.includes(obj.value)) {
+                    obj.value = "";
+                }
+            }
+        }
+
+        function validateField(obj) {
+            if (obj.value === "") {
+                obj.classList.add('error-field');
+                obj.value = "Field is required";
+                return false;
+            }
+            obj.classList.remove('error-field');
+            return true;
+        }
+
+        function validateEmail(obj) {
+            const email = obj.value;
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (email === "") {
+                obj.classList.add('error-field');
+                obj.value = "Email is required";
+                return false;
+            } else if (!emailPattern.test(email)) {
+                obj.classList.add('error-field');
+                obj.value = "Invalid email format (e.g., joe@test.com)";
+                return false;
+            }
+            obj.classList.remove('error-field');
+            return true;
+        }
+
+        function validatePassword(obj) {
+            if (obj.value === "") {
+                obj.classList.add('error-field');
+                obj.value = "Password is required";
+                return false;
+            } else if (obj.value.length < 6) {
+                obj.classList.add('error-field');
+                obj.value = "Password must be at least 6 characters";
+                return false;
+            }
+            obj.classList.remove('error-field');
+            return true;
+        }
+
+        function validateConfirmPassword(obj) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = obj.value;
+            
+            if (confirmPassword === "") {
+                obj.classList.add('error-field');
+                obj.value = "Please confirm your password";
+                return false;
+            } else if (password !== confirmPassword) {
+                obj.classList.add('error-field');
+                obj.value = "Passwords do not match";
+                return false;
+            }
+            obj.classList.remove('error-field');
+            return true;
+        }
+
+        function validateForm() {
+            const username = document.getElementById('username');
+            const email = document.getElementById('email');
+            const password = document.getElementById('password');
+            const confirmPassword = document.getElementById('confirmPassword');
+            
+            const isUsernameValid = validateField(username);
+            const isEmailValid = validateEmail(email);
+            const isPasswordValid = validatePassword(password);
+            const isConfirmPasswordValid = validateConfirmPassword(confirmPassword);
+            
+            if (isUsernameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
+                alert('Account created successfully!');
+                return true;
+            } else {
+                alert('Please fix the errors before submitting.');
+                return false;
+            }
+        }
+    </script>
 </body>
 </html>
